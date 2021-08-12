@@ -52,4 +52,20 @@ public class ProductRepositoryTests {
         Assertions.assertNotNull(product.getId());
         Assertions.assertEquals(countTotalProducts + 1, product.getId());
     }
+
+    @Test
+    public void findByIdShouldReturnNoEmptyOptionalWhenIdExists(){
+
+        Optional<Product> result = productRepository.findById(existId);
+        Assertions.assertTrue(result.isPresent());
+
+    }
+
+    @Test
+    public void findByIdShouldReturnNoEmptyOptionalWhenIdDoesNotExist(){
+
+        Optional<Product> result = productRepository.findById(nonExistingId);
+        Assertions.assertTrue(result.isEmpty());
+
+    }
 }
