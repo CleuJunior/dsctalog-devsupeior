@@ -1,6 +1,16 @@
 package com.devsuperior.dsctalog.entities;
 
-import javax.persistence.*;
+import javax.persistence.Id;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.persistence.ManyToMany;
+import javax.persistence.PreUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
@@ -23,7 +33,12 @@ public class Category implements Serializable {
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant updatedAt;
 
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany
+    @JoinTable(
+            name = "tb_product_category",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     private Set<Product> products = new HashSet<Product>();
 
     public Category()
