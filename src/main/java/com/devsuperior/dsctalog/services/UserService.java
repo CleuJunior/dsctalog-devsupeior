@@ -4,6 +4,7 @@ package com.devsuperior.dsctalog.services;
 
 import com.devsuperior.dsctalog.dto.RoleDTO;
 import com.devsuperior.dsctalog.dto.UserDTO;
+import com.devsuperior.dsctalog.dto.UserInsertDTO;
 import com.devsuperior.dsctalog.entities.Role;
 import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.RoleRepository;
@@ -15,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,9 @@ import java.util.Optional;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,9 +51,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO insert(UserDTO userDTO) {
+    public UserDTO insert(UserInsertDTO userInsertDTO) {
         User entity = new User();
-        copyDtoToEntity(userDTO, entity);
+        copyDtoToEntity(userInsertDTO, entity);
+        entity.setPassword(passwordEncoder.encode(userInsertDTO.getPassword()));
         entity = userRepository.save(entity);
 
         return new UserDTO(entity);
