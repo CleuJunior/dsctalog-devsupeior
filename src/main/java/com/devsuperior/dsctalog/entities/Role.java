@@ -7,11 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.Table;
-import javax.persistence.ManyToMany;
-import javax.persistence.PreUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.JoinTable;
-import javax.persistence.JoinColumn;
+
 
 import java.io.Serializable;
 import java.util.Objects;
