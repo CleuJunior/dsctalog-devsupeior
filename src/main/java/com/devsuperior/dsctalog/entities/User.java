@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import javax.persistence.ManyToMany;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
+import javax.persistence.Column;
 import javax.persistence.FetchType;
 
 import java.io.Serializable;
@@ -26,6 +27,8 @@ public class User implements Serializable {
 
     private String firstName;
     private String lastName;
+
+    @Column(unique = true)
     private String email;
     private String password;
 
