@@ -5,6 +5,7 @@ package com.devsuperior.dsctalog.services;
 import com.devsuperior.dsctalog.dto.RoleDTO;
 import com.devsuperior.dsctalog.dto.UserDTO;
 import com.devsuperior.dsctalog.dto.UserInsertDTO;
+import com.devsuperior.dsctalog.dto.UserUpdateDTO;
 import com.devsuperior.dsctalog.entities.Role;
 import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.RoleRepository;
@@ -62,11 +63,11 @@ public class UserService {
 
 
     @Transactional
-    public UserDTO update(Long id, UserDTO userDTO) {
+    public UserDTO update(Long id, UserUpdateDTO userUpdateDto) {
 
         try {
             User entity = userRepository.getOne(id);
-            copyDtoToEntity(userDTO, entity);
+            copyDtoToEntity(userUpdateDto, entity);
             entity = userRepository.save(entity);
             return new UserDTO(entity);
 
