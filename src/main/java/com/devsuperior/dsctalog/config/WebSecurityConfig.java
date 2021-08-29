@@ -27,14 +27,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/actuator/**");
-    }
+    public void configure(WebSecurity web) throws Exception { web.ignoring().antMatchers("/actuator/**"); }
 
     @Override
     @Bean
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
+    protected AuthenticationManager authenticationManager() throws Exception { return super.authenticationManager(); }
 }
-
