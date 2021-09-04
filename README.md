@@ -14,3 +14,6 @@
 |02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
 |02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
 |02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
+|02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
+|02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
+|02|Testes Automatizados|Introdução a testes automatizados, TDD, JUnit com e sem Spring Boot, testes de integração, mockar dependências com Mockito e MockBean, realizar assertions.| Completo :heavy_check_mark: | 
