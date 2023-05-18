@@ -1,5 +1,14 @@
 package com.devsuperior.dsctalog.entities;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,18 +33,28 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tb_user")
+@NoArgsConstructor
+@RequiredArgsConstructor
+@Data
 public class User implements UserDetails, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NonNull
     private Long id;
 
+    @NonNull
     private String firstName;
+
+    @NonNull
     private String lastName;
 
     @Column(unique = true)
+    @NonNull
     private String email;
+
+    @NonNull
     private String password;
 
 
@@ -45,41 +64,14 @@ public class User implements UserDetails, Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Setter(AccessLevel.NONE)
     private Set<Role> roles = new HashSet<>();
-
-    public User() { }
-
-    public User(Long id, String firstName, String lastName, String email, String password) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-    }
-
-    public Long getId() { return id; }
-
-    public void setId(Long id) { this.id = id; }
-
-    public String getFirstName() { return firstName; }
-
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public String getEmail() { return email; }
-
-    public void setEmail(String email) { this.email = email; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority()))
+        return this.roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority()))
                 .collect(Collectors.toList());
     }
-
-    public String getPassword() { return password; }
 
     @Override
     public String getUsername() { return this.email; }
@@ -96,20 +88,4 @@ public class User implements UserDetails, Serializable {
     @Override
     public boolean isEnabled() { return true; }
 
-    public void setPassword(String password) { this.password = password; }
-
-    public Set<Role> getRoles() { return roles; }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return Objects.equals(getId(), user.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
-    }
 }

@@ -24,5 +24,4 @@ public class Factory {
         return new Category(2L, "Electronics");
     }
 
-
 }

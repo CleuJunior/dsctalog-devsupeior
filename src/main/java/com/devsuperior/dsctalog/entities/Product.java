@@ -1,5 +1,11 @@
 package com.devsuperior.dsctalog.entities;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,6 +15,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "tb_product")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -31,8 +40,8 @@ public class Product implements Serializable {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-
-    Set<Category> categories = new HashSet<>();
+    @Setter(AccessLevel.NONE)
+    private final Set<Category> categories = new HashSet<>();
 
     public Product()
     {
