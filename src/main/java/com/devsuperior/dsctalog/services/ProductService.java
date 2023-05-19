@@ -9,6 +9,7 @@ import com.devsuperior.dsctalog.repositories.CategoryRepository;
 import com.devsuperior.dsctalog.repositories.ProductRepository;
 import com.devsuperior.dsctalog.services.exceptions.DatabaseException;
 import com.devsuperior.dsctalog.services.exceptions.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -22,25 +23,20 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(Pageable pageable)
-    {
-        Page<Product> list = productRepository.findAll(pageable);
-        return list.map(x -> new ProductDTO(x));
-
+    public Page<ProductDTO> findAllPaged(Pageable pageable) {
+        Page<Product> list = this.productRepository.findAll(pageable);
+        return list.map(ProductDTO::new);
     }
 
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id) {
-       Optional<Product> obj = productRepository.findById(id);
+       Optional<Product> obj = this.productRepository.findById(id);
         Product entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
        return new ProductDTO(entity, entity.getCategories());
     }
@@ -49,7 +45,7 @@ public class ProductService {
     public ProductDTO insert(ProductDTO dto) {
         Product entity = new Product();
         copyDtoToEntity(dto, entity);
-        entity = productRepository.save(entity);
+        entity = this.productRepository.save(entity);
 
         return new ProductDTO(entity);
     }
@@ -59,21 +55,19 @@ public class ProductService {
     public ProductDTO update(Long id, ProductDTO dto) {
 
         try {
-            Product entity = productRepository.getOne(id);
+            Product entity = this.productRepository.getOne(id);
             copyDtoToEntity(dto, entity);
-            entity = productRepository.save(entity);
+            entity = this.productRepository.save(entity);
             return new ProductDTO(entity);
 
         } catch (EntityNotFoundException e){
             throw new ResourceNotFoundException("Id not found " + id);
         }
-
-
     }
 
     public void delete(Long id) {
         try {
-            productRepository.deleteById(id);
+            this.productRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Id not found " + id);
 
@@ -92,7 +86,7 @@ public class ProductService {
         entity.getCategories().clear();
 
         for (CategoryDTO catDto: dto.getCategories()) {
-            Category category = categoryRepository.getOne(catDto.getId());
+            Category category = this.categoryRepository.getOne(catDto.getId());
             entity.getCategories().add(category);
         }
     }

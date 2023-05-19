@@ -4,6 +4,7 @@ import com.devsuperior.dsctalog.dto.UserInsertDTO;
 import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.resources.exceptions.FieldMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -12,11 +13,9 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-
+@RequiredArgsConstructor
 public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDTO> {
-
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     @Override
     public void initialize(UserInsertValid ann) {
@@ -24,10 +23,9 @@ public class UserInsertValidator implements ConstraintValidator<UserInsertValid,
 
     @Override
     public boolean isValid(UserInsertDTO dto, ConstraintValidatorContext context) {
-
         List<FieldMessage> list = new ArrayList<>();
 
-        User user = userRepository.findByEmail(dto.getEmail());
+        User user = this.userRepository.findByEmail(dto.getEmail());
         if(user != null){
             list.add(new FieldMessage("email", "Email já existe"));
         }

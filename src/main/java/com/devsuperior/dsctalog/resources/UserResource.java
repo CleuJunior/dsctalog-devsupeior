@@ -58,5 +58,4 @@ public class UserResource {
         this.userService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

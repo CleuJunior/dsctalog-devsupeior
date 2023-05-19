@@ -1,5 +1,6 @@
 package com.devsuperior.dsctalog.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,23 +14,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(this.userDetailsService).passwordEncoder(this.passwordEncoder);
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception { web.ignoring().antMatchers("/actuator/**"); }
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/actuator/**");
+    }
 
     @Override
     @Bean
-    protected AuthenticationManager authenticationManager() throws Exception { return super.authenticationManager(); }
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 }

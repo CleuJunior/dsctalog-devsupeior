@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -27,7 +28,7 @@ public class UserDTO implements Serializable {
     @Email(message = "Entrar com um email válido")
     private String email;
 
-    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Set<RoleDTO> roles = new HashSet<>();
 
     public UserDTO(User entityUser){

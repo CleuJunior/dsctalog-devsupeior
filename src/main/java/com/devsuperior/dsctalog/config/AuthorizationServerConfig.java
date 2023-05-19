@@ -1,10 +1,7 @@
 package com.devsuperior.dsctalog.config;
 
-import java.util.Arrays;
-
-
 import com.devsuperior.dsctalog.components.JwtTokenEnhancer;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,10 +15,12 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableAuthorizationServer
+@RequiredArgsConstructor
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
-
 
     @Value("${security.oauth2.client.client-id}")
     private String clientId;
@@ -31,47 +30,35 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Value("${jwt.duration}")
     private Integer jwtDuration;
-
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtAccessTokenConverter accessTokenConverter;
-
-    @Autowired
-    private JwtTokenStore tokenStore;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private JwtTokenEnhancer tokenEnhancer;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtAccessTokenConverter accessTokenConverter;
+    private final JwtTokenStore tokenStore;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenEnhancer tokenEnhancer;
 
     @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    public void configure(AuthorizationServerSecurityConfigurer security) {
         security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
     }
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient(clientId)
-                .secret(passwordEncoder.encode(clientSecret))
+                .withClient(this.clientId)
+                .secret(this.passwordEncoder.encode(this.clientSecret))
                 .scopes("read", "write")
                 .authorizedGrantTypes("password")
-                .accessTokenValiditySeconds(jwtDuration);
+                .accessTokenValiditySeconds(this.jwtDuration);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-
         TokenEnhancerChain chain = new TokenEnhancerChain();
-        chain.setTokenEnhancers(Arrays.asList(accessTokenConverter, tokenEnhancer));
+        chain.setTokenEnhancers(Arrays.asList(this.accessTokenConverter, this.tokenEnhancer));
 
-        endpoints.authenticationManager(authenticationManager)
-                .tokenStore(tokenStore)
-                .accessTokenConverter(accessTokenConverter)
+        endpoints.authenticationManager(this.authenticationManager)
+                .tokenStore(this.tokenStore)
+                .accessTokenConverter(this.accessTokenConverter)
                 .tokenEnhancer(chain);
     }
 }

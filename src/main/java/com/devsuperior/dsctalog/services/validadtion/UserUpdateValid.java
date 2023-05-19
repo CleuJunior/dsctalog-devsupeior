@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = UserUpdateValidator.class)
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-
 public @interface UserUpdateValid {
     String message() default "Validation error";
 

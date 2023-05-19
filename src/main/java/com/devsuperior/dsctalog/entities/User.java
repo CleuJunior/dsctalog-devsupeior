@@ -1,10 +1,7 @@
 package com.devsuperior.dsctalog.entities;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -13,21 +10,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Id;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Table;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinTable;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,20 +38,12 @@ public class User implements UserDetails, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NonNull
     private Long id;
-
-    @NonNull
     private String firstName;
-
-    @NonNull
     private String lastName;
 
     @Column(unique = true)
-    @NonNull
     private String email;
-
-    @NonNull
     private String password;
-
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -74,18 +61,27 @@ public class User implements UserDetails, Serializable {
     }
 
     @Override
-    public String getUsername() { return this.email; }
+    public String getUsername() {
+        return this.email;
+    }
 
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
     @Override
-    public boolean isEnabled() { return true; }
-
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -11,6 +11,7 @@ import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.services.exceptions.DatabaseException;
 import com.devsuperior.dsctalog.services.exceptions.ResourceNotFoundException;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,30 +30,23 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-
-    private static Logger logger = LoggerFactory.getLogger(UserService.class);
-
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
-    public Page<UserDTO> findAllPaged(Pageable pageable)
-    {
-        Page<User> list = userRepository.findAll(pageable);
-        return list.map(x -> new UserDTO(x));
+    public Page<UserDTO> findAllPaged(Pageable pageable) {
+        Page<User> list = this.userRepository.findAll(pageable);
+        return list.map(UserDTO::new);
 
     }
 
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
-       Optional<User> obj = userRepository.findById(id);
+       Optional<User> obj = this.userRepository.findById(id);
         User entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
        return new UserDTO(entity);
     }
@@ -61,8 +55,8 @@ public class UserService implements UserDetailsService {
     public UserDTO insert(UserInsertDTO userInsertDTO) {
         User entity = new User();
         copyDtoToEntity(userInsertDTO, entity);
-        entity.setPassword(passwordEncoder.encode(userInsertDTO.getPassword()));
-        entity = userRepository.save(entity);
+        entity.setPassword(this.passwordEncoder.encode(userInsertDTO.getPassword()));
+        entity = this.userRepository.save(entity);
 
         return new UserDTO(entity);
     }
@@ -72,9 +66,9 @@ public class UserService implements UserDetailsService {
     public UserDTO update(Long id, UserUpdateDTO userUpdateDto) {
 
         try {
-            User entity = userRepository.getOne(id);
+            User entity = this.userRepository.getOne(id);
             copyDtoToEntity(userUpdateDto, entity);
-            entity = userRepository.save(entity);
+            entity = this.userRepository.save(entity);
             return new UserDTO(entity);
 
         } catch (EntityNotFoundException e){
@@ -86,7 +80,7 @@ public class UserService implements UserDetailsService {
 
     public void delete(Long id) {
         try {
-            userRepository.deleteById(id);
+            this.userRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Id not found " + id);
 
@@ -103,7 +97,7 @@ public class UserService implements UserDetailsService {
         userEntity.getRoles().clear();
 
         for (RoleDTO roleDto: userDTO.getRoles()) {
-            Role role = roleRepository.getOne(roleDto.getId());
+            Role role = this.roleRepository.getOne(roleDto.getId());
             userEntity.getRoles().add(role);
         }
     }
@@ -111,12 +105,13 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByEmail(username);
 
-        User user = userRepository.findByEmail(username);
         if (user == null) {
             logger.error("User not found: " + username);
             throw new UsernameNotFoundException("Email not found");
         }
+
         logger.info("User found: " + username);
         return user;
     }
