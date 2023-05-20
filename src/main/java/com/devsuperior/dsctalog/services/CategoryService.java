@@ -6,6 +6,7 @@ import com.devsuperior.dsctalog.repositories.CategoryRepository;
 import com.devsuperior.dsctalog.services.exceptions.DatabaseException;
 import com.devsuperior.dsctalog.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -20,37 +21,38 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
     public Page<CategoryDTO> findAllPaged(Pageable pageable) {
-        Page<Category> list = this.categoryRepository.findAll(pageable);
-        return list.map(CategoryDTO::new);
-
+        return this.categoryRepository.findAll(pageable)
+                .map(cat -> this.mapper.map(cat, CategoryDTO.class));
     }
 
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
-       Optional<Category> obj = this.categoryRepository.findById(id);
-       Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
-       return new CategoryDTO(entity);
+       Optional<Category> optionalCategory = this.categoryRepository.findById(id);
+       Category response = optionalCategory.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+
+       return this.mapper.map(response, CategoryDTO.class);
     }
 
     @Transactional
-    public CategoryDTO insert(CategoryDTO dto) {
-        Category entity = new Category();
-        entity.setName(dto.getName());
-        entity = this.categoryRepository.save(entity);
+    public CategoryDTO insert(CategoryDTO request) {
+        Category response = this.mapper.map(request, Category.class);
+        response = this.categoryRepository.save(response);
 
-        return new CategoryDTO(entity);
+        return this.mapper.map(response, CategoryDTO.class);
     }
 
     @Transactional
-    public CategoryDTO update(Long id, CategoryDTO dto) {
+    public CategoryDTO update(Long id, CategoryDTO request) {
         try {
-            Category entity = this.categoryRepository.getOne(id);
-            entity.setName(dto.getName());
-            entity = this.categoryRepository.save(entity);
-            return new CategoryDTO(entity);
+            Category response = this.categoryRepository.getOne(id);
+            response.setName(request.getName());
+            response = this.categoryRepository.save(response);
+
+            return this.mapper.map(response, CategoryDTO.class);
 
         } catch (EntityNotFoundException e){
             throw new ResourceNotFoundException("Id not found " + id);

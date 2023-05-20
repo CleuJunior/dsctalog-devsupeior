@@ -10,11 +10,10 @@ import com.devsuperior.dsctalog.repositories.RoleRepository;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.services.exceptions.DatabaseException;
 import com.devsuperior.dsctalog.services.exceptions.ResourceNotFoundException;
-
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -36,26 +35,27 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ModelMapper mapper;
 
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllPaged(Pageable pageable) {
-        Page<User> list = this.userRepository.findAll(pageable);
-        return list.map(UserDTO::new);
-
+        return this.userRepository.findAll(pageable)
+                .map(user -> this.mapper.map(user, UserDTO.class));
     }
 
     @Transactional(readOnly = true)
     public UserDTO findById(Long id) {
-       Optional<User> obj = this.userRepository.findById(id);
-        User entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
-       return new UserDTO(entity);
+       Optional<User> optionalUser = this.userRepository.findById(id);
+       User response = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+
+       return this.mapper.map(response, UserDTO.class);
     }
 
     @Transactional
-    public UserDTO insert(UserInsertDTO userInsertDTO) {
+    public UserDTO insert(UserInsertDTO request) {
         User entity = new User();
-        copyDtoToEntity(userInsertDTO, entity);
-        entity.setPassword(this.passwordEncoder.encode(userInsertDTO.getPassword()));
+        copyDtoToEntity(request, entity);
+        entity.setPassword(this.passwordEncoder.encode(request.getPassword()));
         entity = this.userRepository.save(entity);
 
         return new UserDTO(entity);
@@ -74,8 +74,6 @@ public class UserService implements UserDetailsService {
         } catch (EntityNotFoundException e){
             throw new ResourceNotFoundException("Id not found " + id);
         }
-
-
     }
 
     public void delete(Long id) {
