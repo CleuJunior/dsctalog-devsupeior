@@ -5,7 +5,6 @@ import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.resources.exceptions.FieldMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;

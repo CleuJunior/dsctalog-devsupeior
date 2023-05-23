@@ -5,13 +5,11 @@ import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.resources.exceptions.FieldMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDTO> {

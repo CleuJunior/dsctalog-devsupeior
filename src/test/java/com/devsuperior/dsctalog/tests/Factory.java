@@ -22,7 +22,7 @@ public class Factory {
     }
 
     public static ProductDTO createProductDTO(){
-        Product product = createProduct();
+        Product product = Factory.createProduct();
         return new ProductDTO(product, product.getCategories());
     }
 

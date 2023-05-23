@@ -3,7 +3,6 @@ package com.devsuperior.dsctalog.services;
 
 import com.devsuperior.dsctalog.dto.CategoryDTO;
 import com.devsuperior.dsctalog.dto.ProductDTO;
-import com.devsuperior.dsctalog.entities.Category;
 import com.devsuperior.dsctalog.entities.Product;
 import com.devsuperior.dsctalog.repositories.CategoryRepository;
 import com.devsuperior.dsctalog.repositories.ProductRepository;

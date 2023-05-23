@@ -2,7 +2,6 @@ package com.devsuperior.dsctalog.dto;
 
 import com.devsuperior.dsctalog.entities.Role;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
