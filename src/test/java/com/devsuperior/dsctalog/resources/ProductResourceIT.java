@@ -21,9 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
-public class ProductResourceIT {
+class ProductResourceIT {
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,17 +43,18 @@ public class ProductResourceIT {
     }
 
     @Test
-    public void updateShouldReturnProductDTOWhenIdExists() throws Exception{
-        ProductDTO productDTO = Factory.createProductDTO();
-        String jsonBody = objectMapper.writeValueAsString(productDTO);
+    void updateShouldReturnProductDTOWhenIdExists() throws Exception{
+        var productDTO = Factory.createProductDTO();
+        var jsonBody = objectMapper.writeValueAsString(productDTO);
 
-        String expectedName = productDTO.getName();
-        String expectedDescription = productDTO.getDescription();
+        var expectedName = productDTO.getName();
+        var expectedDescription = productDTO.getDescription();
 
-        ResultActions result = mockMvc.perform(put("/products/{id}", existingId)
+        var result = mockMvc.perform(put("/products/{id}", existingId)
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
+
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.id").value(existingId));
         result.andExpect(jsonPath("$.name").value(expectedName));
@@ -61,23 +62,24 @@ public class ProductResourceIT {
     }
 
     @Test
-    public void updateShouldReturnNotFoundWhenIdNotExists() throws Exception{
-        ProductDTO productDTO = Factory.createProductDTO();
-        String jsonBody = objectMapper.writeValueAsString(productDTO);
+    void updateShouldReturnNotFoundWhenIdNotExists() throws Exception{
+        var productDTO = Factory.createProductDTO();
+        var jsonBody = objectMapper.writeValueAsString(productDTO);
 
-        String expectedName = productDTO.getName();
-        String expectedDescription = productDTO.getDescription();
+        var expectedName = productDTO.getName();
+        var expectedDescription = productDTO.getDescription();
 
-        ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId)
+        var result = mockMvc.perform(put("/products/{id}", nonExistingId)
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
+
         result.andExpect(status().isNotFound());
     }
 
     @Test
-    public void findAllShouldReturnSortedPageWhenSortByName() throws Exception{
-        ResultActions result = mockMvc.perform(get("/products?page=0&size=12&sort=name,asc").accept(MediaType.APPLICATION_JSON));
+    void findAllShouldReturnSortedPageWhenSortByName() throws Exception{
+        var result = mockMvc.perform(get("/products?page=0&size=12&sort=name,asc").accept(MediaType.APPLICATION_JSON));
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.totalElements").value(countTotalProducts));

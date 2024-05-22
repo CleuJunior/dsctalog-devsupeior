@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-public class ProductServiceIT {
+class ProductServiceIT {
 
     @Autowired
     private ProductService productService;
@@ -36,20 +36,20 @@ public class ProductServiceIT {
     }
 
     @Test
-    public void deleteShouldDeleteResourceWhenIdExists(){
+    void deleteShouldDeleteResourceWhenIdExists(){
         productService.delete(existingId);
         Assertions.assertEquals(countTotalProducts - 1, productRepository.count());
     }
 
     @Test
-    public void deleteShouldThrowsResourceNotFoundExceptionWhenIdNotExists(){
+    void deleteShouldThrowsResourceNotFoundExceptionWhenIdNotExists(){
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
             productService.delete(nonExistingId);
         });
     }
 
     @Test
-    public void findAllPagedShouldReturnPageWhenPage0Size10(){
+    void findAllPagedShouldReturnPageWhenPage0Size10(){
         PageRequest pageRequest = PageRequest.of(0,10);
         Page<ProductDTO> result = productService.findAllPaged(pageRequest);
 
@@ -60,7 +60,7 @@ public class ProductServiceIT {
     }
 
     @Test
-    public void findAllPagedShouldReturnEmptyPageWhenPageDoesNotExist(){
+    void findAllPagedShouldReturnEmptyPageWhenPageDoesNotExist(){
         PageRequest pageRequest = PageRequest.of(50,10);
         Page<ProductDTO> result = productService.findAllPaged(pageRequest);
 
@@ -69,7 +69,7 @@ public class ProductServiceIT {
     }
 
     @Test
-    public void findAllPagedShouldReturnSortedPageWhenSortByName(){
+    void findAllPagedShouldReturnSortedPageWhenSortByName(){
         PageRequest pageRequest = PageRequest.of(0,10, Sort.by("name"));
         Page<ProductDTO> result = productService.findAllPaged(pageRequest);
 

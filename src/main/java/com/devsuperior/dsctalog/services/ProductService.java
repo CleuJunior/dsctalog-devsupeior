@@ -11,15 +11,12 @@ import com.devsuperior.dsctalog.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,61 +27,59 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductDTO> findAllPaged(Pageable pageable) {
-        return this.productRepository.findAll(pageable)
-                .map(prod -> this.mapper.map(prod, ProductDTO.class));
+        return productRepository.findAll(pageable)
+                .map(prod -> mapper.map(prod, ProductDTO.class));
     }
 
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id) {
-       Optional<Product> optionalProduct = this.productRepository.findById(id);
-       Product response = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+        var response = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
-       return this.mapper.map(response, ProductDTO.class);
+        return mapper.map(response, ProductDTO.class);
     }
 
     @Transactional
     public ProductDTO insert(ProductDTO request) {
-        Product response = this.mapper.map(request, Product.class);
-        response = this.productRepository.save(response);
+        var response = mapper.map(request, Product.class);
+        response = productRepository.save(response);
 
-        return this.mapper.map(response, ProductDTO.class);
+        return mapper.map(response, ProductDTO.class);
     }
 
     @Transactional
     public ProductDTO update(Long id, ProductDTO request) {
-        try {
-            Product response = this.productRepository.getOne(id);
+        var response = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
-            response.setName(request.getName());
-            response.setDescription(request.getDescription());
-            response.setDate(request.getDate());
-            response.setImgUrl(request.getImgUrl());
-            response.setPrice(request.getPrice());
-            response.getCategories().clear();
+        response.setName(request.getName());
+        response.setDescription(request.getDescription());
+        response.setDate(request.getDate());
+        response.setImgUrl(request.getImgUrl());
+        response.setPrice(request.getPrice());
+        response.getCategories().clear();
 
-            this.copyCategoryToEntity(request.getCategories(), response);
-            response = this.productRepository.save(response);
+        copyCategoryToEntity(request.getCategories(), response);
+        response = productRepository.save(response);
 
-            return this.mapper.map(response, ProductDTO.class);
-        } catch (EntityNotFoundException e){
-            throw new ResourceNotFoundException("Id not found " + id);
-        }
+        return mapper.map(response, ProductDTO.class);
     }
 
     public void delete(Long id) {
         try {
-            this.productRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException e){
-            throw new ResourceNotFoundException("Id not found " + id);
+            var product = productRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
-        } catch(DataIntegrityViolationException e) {
+            productRepository.delete(product);
+
+        } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation");
         }
     }
 
     private void copyCategoryToEntity(List<CategoryDTO> categoriesDTO, Product product) {
         categoriesDTO.stream()
-                .map(catDto -> this.categoryRepository.getOne(catDto.getId()))
+                .map(catDto -> categoryRepository.getOne(catDto.getId()))
                 .forEach(product.getCategories()::add);
 
     }

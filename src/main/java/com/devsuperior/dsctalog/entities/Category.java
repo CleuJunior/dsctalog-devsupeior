@@ -1,11 +1,11 @@
 package com.devsuperior.dsctalog.entities;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,19 +21,23 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import static java.time.Instant.now;
+import static lombok.AccessLevel.NONE;
 
 @Entity
 @Table(name = "tb_category")
 @NoArgsConstructor
-@RequiredArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 public class Category implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NonNull
     private Long id;
 
     @NonNull
@@ -51,16 +55,35 @@ public class Category implements Serializable {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @Setter(AccessLevel.NONE)
+    @Setter(NONE)
+    @ToString.Exclude
     private Set<Product> products = new HashSet<>();
+
+    public Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = Instant.now();
+        createdAt = now();
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = Instant.now();
+        updatedAt = now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Category category = (Category) o;
+        return getId() != null && Objects.equals(getId(), category.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
