@@ -12,6 +12,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import java.util.Arrays;
 
+import static java.util.Arrays.asList;
+import static org.springframework.http.HttpMethod.GET;
+
 @Configuration
 @EnableResourceServer
 @RequiredArgsConstructor
@@ -24,19 +27,21 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.tokenStore(this.tokenStore);
+        resources.tokenStore(tokenStore);
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
         // H2
-        if (Arrays.asList(this.env.getActiveProfiles()).contains("test")) {
-            http.headers().frameOptions().disable();
+        if (asList(env.getActiveProfiles()).contains("test")) {
+            http.headers()
+                    .frameOptions()
+                    .disable();
         }
 
         http.authorizeRequests()
                 .antMatchers(PUBLIC).permitAll()
-                .antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll()
+                .antMatchers(GET, OPERATOR_OR_ADMIN).permitAll()
                 .antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN")
                 .antMatchers(ADMIN).hasRole("ADMIN")
                 .anyRequest().authenticated();
