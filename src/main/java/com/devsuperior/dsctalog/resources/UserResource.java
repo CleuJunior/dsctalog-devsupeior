@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
+
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -29,33 +32,37 @@ public class UserResource {
 
     @GetMapping
     public ResponseEntity<Page<UserDTO>> findAll(Pageable pageable) {
-        Page<UserDTO> list = this.userService.findAllPaged(pageable);
-        return ResponseEntity.ok().body(list);
+        var list = userService.findAllPaged(pageable);
+        return ok().body(list);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserDTO> findByID(@PathVariable Long id) {
-        UserDTO dto = this.userService.findById(id);
-        return ResponseEntity.ok().body(dto);
+        var dto = userService.findById(id);
+        return ok().body(dto);
     }
 
     @PostMapping
     public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserInsertDTO dto) {
-        UserDTO userDTO = this.userService.insert(dto);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(userDTO.getId()).toUri();
-        return ResponseEntity.created(uri).body(userDTO);
+        var userDTO = userService.insert(dto);
+        var uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(userDTO.getId())
+                .toUri();
+
+        return created(uri).body(userDTO);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
-        UserDTO newDto = this.userService.update(id, dto);
-        return ResponseEntity.ok().body(newDto);
+        var newDto = userService.update(id, dto);
+        return ok().body(newDto);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
-        this.userService.delete(id);
-        return ResponseEntity.noContent().build();
+        userService.delete(id);
+        return noContent().build();
     }
 }

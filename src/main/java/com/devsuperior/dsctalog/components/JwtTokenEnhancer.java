@@ -1,6 +1,5 @@
 package com.devsuperior.dsctalog.components;
 
-import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -11,7 +10,6 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 @Component
@@ -21,13 +19,13 @@ public class JwtTokenEnhancer implements TokenEnhancer {
 
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, @NonNull OAuth2Authentication authentication) {
-        User user = this.userRepository.findByEmail(authentication.getName());
+        var user = userRepository.findByEmail(authentication.getName());
+        var map = new HashMap<String, Object>();
 
-        Map<String, Object> map = new HashMap<>();
         map.put("userFirstName", user.getFirstName());
         map.put("userId", user.getId());
 
-        DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) accessToken;
+        var token = (DefaultOAuth2AccessToken) accessToken;
         token.setAdditionalInformation(map);
 
         return accessToken;

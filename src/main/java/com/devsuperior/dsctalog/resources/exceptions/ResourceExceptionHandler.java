@@ -12,52 +12,58 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static org.springframework.http.ResponseEntity.status;
+
 @ControllerAdvice
 public class ResourceExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<StandardError> entityNotFound(ResourceNotFoundException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        var status = NOT_FOUND;
+        var err = new StandardError();
 
-        StandardError err = new StandardError();
         err.setTimestamp(Instant.now());
         err.setStatus(status.value());
         err.setError("Resource not found");
         err.setMessage(e.getMessage());
         err.setPath(request.getRequestURI());
 
-        return ResponseEntity.status(status).body(err);
+        return status(status).body(err);
     }
 
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<StandardError> database(DatabaseException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        var status = BAD_REQUEST;
+        var err = new StandardError();
 
-        StandardError err = new StandardError();
         err.setTimestamp(Instant.now());
         err.setStatus(status.value());
         err.setError("Database exception");
         err.setMessage(e.getMessage());
         err.setPath(request.getRequestURI());
 
-        return ResponseEntity.status(status).body(err);
+        return status(status).body(err);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        var status = UNPROCESSABLE_ENTITY;
+        var err = new ValidationError();
 
-        ValidationError err = new ValidationError();
         err.setTimestamp(Instant.now());
         err.setStatus(status.value());
         err.setError("Validation exception");
         err.setMessage(e.getMessage());
         err.setPath(request.getRequestURI());
 
-        for(FieldError f: e.getBindingResult().getFieldErrors()){
-            err.addError(f.getField(), f.getDefaultMessage());
-        }
+        e.getBindingResult()
+                .getFieldErrors()
+                .forEach(f -> err.addError(f.getField(), f.getDefaultMessage()));
 
-        return ResponseEntity.status(status).body(err);
+
+        return status(status).body(err);
     }
 }

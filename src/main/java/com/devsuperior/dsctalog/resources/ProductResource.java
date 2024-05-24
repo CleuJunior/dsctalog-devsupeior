@@ -19,6 +19,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
+
 @RestController
 @RequestMapping(value = "/products")
 @RequiredArgsConstructor
@@ -27,35 +31,38 @@ public class ProductResource {
 
     @GetMapping
     public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        Page<ProductDTO> list = this.productService.findAllPaged(pageable);
-        return ResponseEntity.ok().body(list);
+        var list = productService.findAllPaged(pageable);
+        return ok().body(list);
     }
 
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> findByID(@PathVariable Long id) {
-        ProductDTO dto = this.productService.findById(id);
-        return ResponseEntity.ok().body(dto);
+        var dto = productService.findById(id);
+        return ok().body(dto);
     }
 
     @PostMapping
     public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO dto) {
-        dto = this.productService.insert(dto);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(dto.getId()).toUri();
-        return ResponseEntity.created(uri).body(dto);
+        dto = productService.insert(dto);
+        var uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(dto.getId())
+                .toUri();
+
+        return created(uri).body(dto);
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
-        dto = this.productService.update(id, dto);
-        return ResponseEntity.ok().body(dto);
+        dto = productService.update(id, dto);
+        return ok().body(dto);
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<ProductDTO> delete(@PathVariable Long id) {
-        this.productService.delete(id);
-        return ResponseEntity.noContent().build();
+        productService.delete(id);
+        return noContent().build();
     }
-
 }

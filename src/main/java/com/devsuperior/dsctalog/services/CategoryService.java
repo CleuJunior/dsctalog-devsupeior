@@ -25,34 +25,34 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public Page<CategoryDTO> findAllPaged(Pageable pageable) {
-        return this.categoryRepository.findAll(pageable)
-                .map(cat -> this.mapper.map(cat, CategoryDTO.class));
+        return categoryRepository.findAll(pageable)
+                .map(cat -> mapper.map(cat, CategoryDTO.class));
     }
 
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
-       Optional<Category> optionalCategory = this.categoryRepository.findById(id);
-       Category response = optionalCategory.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+       var optionalCategory = categoryRepository.findById(id);
+       var response = optionalCategory.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
 
-       return this.mapper.map(response, CategoryDTO.class);
+       return mapper.map(response, CategoryDTO.class);
     }
 
     @Transactional
     public CategoryDTO insert(CategoryDTO request) {
-        Category response = this.mapper.map(request, Category.class);
-        response = this.categoryRepository.save(response);
+        var response = mapper.map(request, Category.class);
+        response = categoryRepository.save(response);
 
-        return this.mapper.map(response, CategoryDTO.class);
+        return mapper.map(response, CategoryDTO.class);
     }
 
     @Transactional
     public CategoryDTO update(Long id, CategoryDTO request) {
         try {
-            Category response = this.categoryRepository.getOne(id);
+            Category response = categoryRepository.getOne(id);
             response.setName(request.getName());
-            response = this.categoryRepository.save(response);
+            response = categoryRepository.save(response);
 
-            return this.mapper.map(response, CategoryDTO.class);
+            return mapper.map(response, CategoryDTO.class);
 
         } catch (EntityNotFoundException e){
             throw new ResourceNotFoundException("Id not found " + id);
@@ -61,7 +61,7 @@ public class CategoryService {
 
     public void delete(Long id) {
         try {
-            this.categoryRepository.deleteById(id);
+            categoryRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e){
             throw new ResourceNotFoundException("Id not found " + id);
 

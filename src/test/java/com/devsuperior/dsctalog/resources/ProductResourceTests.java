@@ -8,7 +8,6 @@ import com.devsuperior.dsctalog.tests.Factory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -48,12 +47,13 @@ class ProductResourceTests {
     private PageImpl<ProductDTO> page;
 
     @BeforeEach()
-    void setup() throws Exception {
+    void setup() {
         existingId = 1L;
         nonExistingId = 2L;
         dependentId = 3L;
         productDTO = Factory.createProductDTO();
         page = new PageImpl<>(List.of(productDTO));
+
         when(productService.findAllPaged(any())).thenReturn(page);
         when(productService.findById(existingId)).thenReturn(productDTO);
         when(productService.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
@@ -61,7 +61,9 @@ class ProductResourceTests {
         when(productService.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
         when(productService.update(eq(existingId), any())).thenReturn(productDTO);
         when(productService.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
+
         doNothing().when(productService).delete(existingId);
+
         doThrow(ResourceNotFoundException.class).when(productService).delete(nonExistingId);
         doThrow(DatabaseException.class).when(productService).delete(dependentId);
 
@@ -78,14 +80,15 @@ class ProductResourceTests {
 
     @Test
     void deleteShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
-        ResultActions result = mockMvc.perform(delete("/products/{id}", nonExistingId).accept(APPLICATION_JSON));
+        var result = mockMvc.perform(delete("/products/{id}", nonExistingId).accept(APPLICATION_JSON));
         result.andExpect(status().isNotFound());
     }
 
     @Test
     void insertShouldReturnProductDTOCreated() throws Exception {
-        ResultActions result = mockMvc.perform(post("/products", existingId)
+        var result = mockMvc.perform(post("/products", existingId)
                 .accept(APPLICATION_JSON));
+
         result.andExpect(status().isCreated());
         result.andExpect(jsonPath("$.id").exists());
         result.andExpect(jsonPath("$.name").exists());
@@ -113,7 +116,7 @@ class ProductResourceTests {
     void updateShouldReturnNotFoundWhenIdNotExists() throws Exception {
         var jsonBody = objectMapper.writeValueAsString(productDTO);
 
-        ResultActions result = mockMvc
+        var result = mockMvc
                 .perform(put("/products/{id}", nonExistingId)
                         .content(jsonBody)
                         .contentType(APPLICATION_JSON)

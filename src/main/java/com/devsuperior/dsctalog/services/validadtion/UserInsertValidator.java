@@ -1,7 +1,6 @@
 package com.devsuperior.dsctalog.services.validadtion;
 
 import com.devsuperior.dsctalog.dto.UserInsertDTO;
-import com.devsuperior.dsctalog.entities.User;
 import com.devsuperior.dsctalog.repositories.UserRepository;
 import com.devsuperior.dsctalog.resources.exceptions.FieldMessage;
 import lombok.RequiredArgsConstructor;
@@ -9,30 +8,33 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
-import java.util.List;
+
+import static java.util.Objects.nonNull;
 
 @RequiredArgsConstructor
 public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDTO> {
     private final UserRepository userRepository;
-    
+
     @Override
     public void initialize(UserInsertValid ann) {
     }
 
     @Override
     public boolean isValid(UserInsertDTO dto, ConstraintValidatorContext context) {
-        List<FieldMessage> list = new ArrayList<>();
+        var list = new ArrayList<FieldMessage>();
+        var user = userRepository.findByEmail(dto.getEmail());
 
-        User user = this.userRepository.findByEmail(dto.getEmail());
-        if(user != null){
+        if (nonNull(user)) {
             list.add(new FieldMessage("email", "Email já existe"));
         }
 
-        for (FieldMessage e : list) {
+        list.forEach(e -> {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(e.getMessage()).addPropertyNode(e.getFieldName())
+            context.buildConstraintViolationWithTemplate(e.getMessage())
+                    .addPropertyNode(e.getFieldName())
                     .addConstraintViolation();
-        }
+        });
+
         return list.isEmpty();
     }
 }

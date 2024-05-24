@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 @Entity
 @Table(name = "tb_role")
 @NoArgsConstructor
@@ -20,7 +22,7 @@ public class Role implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
     private String authority;
 }
