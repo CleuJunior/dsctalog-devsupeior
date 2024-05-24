@@ -1,20 +1,17 @@
 package com.devsuperior.dsctalog.resources;
 
 
-import com.devsuperior.dsctalog.dto.ProductDTO;
 import com.devsuperior.dsctalog.tests.Factory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,7 +24,6 @@ class ProductResourceIT {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -36,14 +32,14 @@ class ProductResourceIT {
     private Long countTotalProducts;
 
     @BeforeEach()
-    void setup() throws Exception {
+    void setup() {
         existingId = 1L;
         nonExistingId = 2333L;
         countTotalProducts = 25L;
     }
 
     @Test
-    void updateShouldReturnProductDTOWhenIdExists() throws Exception{
+    void updateShouldReturnProductDTOWhenIdExists() throws Exception {
         var productDTO = Factory.createProductDTO();
         var jsonBody = objectMapper.writeValueAsString(productDTO);
 
@@ -52,8 +48,8 @@ class ProductResourceIT {
 
         var result = mockMvc.perform(put("/products/{id}", existingId)
                 .content(jsonBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON));
+                .contentType(APPLICATION_JSON)
+                .accept(APPLICATION_JSON));
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.id").value(existingId));
@@ -62,24 +58,26 @@ class ProductResourceIT {
     }
 
     @Test
-    void updateShouldReturnNotFoundWhenIdNotExists() throws Exception{
+    void updateShouldReturnNotFoundWhenIdNotExists() throws Exception {
         var productDTO = Factory.createProductDTO();
         var jsonBody = objectMapper.writeValueAsString(productDTO);
 
         var expectedName = productDTO.getName();
         var expectedDescription = productDTO.getDescription();
 
-        var result = mockMvc.perform(put("/products/{id}", nonExistingId)
-                .content(jsonBody)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON));
+        var result = mockMvc
+                .perform(put("/products/{id}", nonExistingId)
+                        .content(jsonBody)
+                        .contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON));
 
         result.andExpect(status().isNotFound());
     }
 
     @Test
-    void findAllShouldReturnSortedPageWhenSortByName() throws Exception{
-        var result = mockMvc.perform(get("/products?page=0&size=12&sort=name,asc").accept(MediaType.APPLICATION_JSON));
+    void findAllShouldReturnSortedPageWhenSortByName() throws Exception {
+        var result = mockMvc
+                .perform(get("/products?page=0&size=12&sort=name,asc").accept(APPLICATION_JSON));
 
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.totalElements").value(countTotalProducts));

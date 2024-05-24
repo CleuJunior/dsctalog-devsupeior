@@ -1,20 +1,23 @@
 package com.devsuperior.dsctalog.repositories;
 
-import com.devsuperior.dsctalog.entities.Product;
 import com.devsuperior.dsctalog.tests.Factory;
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@RequiredArgsConstructor
 class ProductRepositoryTests {
-    private final ProductRepository productRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
     private long existId;
     private long nonExistingId;
     private Long countTotalProducts;
@@ -27,37 +30,37 @@ class ProductRepositoryTests {
     }
 
     @Test
-    void deleteShouldDeleteObjectWhenIdExists(){
-        this.productRepository.deleteById(this.existId);
-        Optional<Product> result = this.productRepository.findById(this.existId);
-        Assertions.assertFalse(result.isPresent());
+    void deleteShouldDeleteObjectWhenIdExists() {
+        productRepository.deleteById(existId);
+        var result = productRepository.findById(existId);
+        assertFalse(result.isPresent());
     }
 
     @Test
-    void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdNotExists(){
-        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> this.productRepository.deleteById(this.nonExistingId));
+    void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdNotExists() {
+        assertThrows(EmptyResultDataAccessException.class, () -> productRepository.deleteById(nonExistingId));
     }
 
     @Test
-    void saveShouldPersistWithAutoincrementWhenIdIsNull(){
-        Product product = Factory.createProduct();
+    void saveShouldPersistWithAutoincrementWhenIdIsNull() {
+        var product = Factory.createProduct();
         product.setId(null);
 
-        product = this.productRepository.save(product);
+        product = productRepository.save(product);
 
-        Assertions.assertNotNull(product.getId());
-        Assertions.assertEquals(this.countTotalProducts + 1, product.getId());
+        assertNotNull(product.getId());
+        assertEquals(countTotalProducts + 1, product.getId());
     }
 
     @Test
-    void findByIdShouldReturnNoEmptyOptionalWhenIdExists(){
-        Optional<Product> result = this.productRepository.findById(this.existId);
-        Assertions.assertTrue(result.isPresent());
+    void findByIdShouldReturnNoEmptyOptionalWhenIdExists() {
+        var result = productRepository.findById(existId);
+        assertTrue(result.isPresent());
     }
 
     @Test
-    void findByIdShouldReturnNoEmptyOptionalWhenIdDoesNotExist(){
-        Optional<Product> result = this.productRepository.findById(this.nonExistingId);
-        Assertions.assertTrue(result.isEmpty());
+    void findByIdShouldReturnNoEmptyOptionalWhenIdDoesNotExist() {
+        var result = productRepository.findById(nonExistingId);
+        assertTrue(result.isEmpty());
     }
 }
