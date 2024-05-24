@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static java.time.Instant.now;
+import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.NONE;
 
 @Entity
@@ -37,7 +38,7 @@ public class Category implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @NonNull

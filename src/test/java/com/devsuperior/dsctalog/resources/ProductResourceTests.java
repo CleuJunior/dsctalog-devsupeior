@@ -1,5 +1,6 @@
 package com.devsuperior.dsctalog.resources;
 
+import com.devsuperior.dsctalog.config.AppConfig;
 import com.devsuperior.dsctalog.dto.ProductDTO;
 import com.devsuperior.dsctalog.services.ProductService;
 import com.devsuperior.dsctalog.services.exceptions.DatabaseException;
@@ -10,8 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -27,10 +31,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ProductResource.class)
+//@WebMvcTest(ProductResource.class)
+@SpringBootTest(classes = { AppConfig.class,  ObjectMapper.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class ProductResourceTests {
 
     @Mock
@@ -86,7 +94,7 @@ class ProductResourceTests {
 
     @Test
     void insertShouldReturnProductDTOCreated() throws Exception {
-        var result = mockMvc.perform(post("/products", existingId)
+        var result = mockMvc.perform(post("/products")
                 .accept(APPLICATION_JSON));
 
         result.andExpect(status().isCreated());
@@ -101,10 +109,11 @@ class ProductResourceTests {
         var jsonBody = objectMapper.writeValueAsString(productDTO);
 
         var result = mockMvc
-                .perform(post("/products")
+                .perform(put("/products", existingId)
                         .content(jsonBody)
                         .contentType(APPLICATION_JSON)
-                        .accept(APPLICATION_JSON));
+                        .accept(APPLICATION_JSON))
+                .andDo(print());
 
         result.andExpect(status().isCreated());
         result.andExpect(jsonPath("$.id").exists());
@@ -156,6 +165,3 @@ class ProductResourceTests {
         result.andExpect(status().isOk());
     }
 }
-
-
-
